@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clicker Game</title>
+    <style>
+      @import url("//cdn.web-fonts.ge/fonts/alk-sanet/css/alk-sanet.min.css");
+
+      body {
+        background-color: black;
+        overflow: hidden;
+        font-family: "ALK Sanet", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .game-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        margin-top: 10px;
+      }
+
+      .score {
+        color: white;
+        font-size: 1.4rem;
+        position: absolute;
+        top: -10px;
+        right: 0;
+        text-align: left;
+        width: 100%;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+        margin: 0;
+      }
+
+      .polygon {
+        position: relative;
+        background-color: white;
+        width: 450px;
+        height: 450px;
+        border-radius: 5px;
+        z-index: 0;
+        margin-top: 30px;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      }
+
+      .object {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background-color: red;
+        z-index: 2;
+        cursor: pointer;
+        transition: width 0.3s, height 0.3s;
+      }
+
+      #lose {
+        position: relative;
+        text-align: center;
+        margin-top: 20px;
+        color: #ff7e31;
+        font-size: 1.8rem;
+        display: none;
+      }
+
+      #restart {
+        background-image: linear-gradient(-180deg, #ff7e31, #e62c03);
+        border-radius: 6px;
+        box-shadow: rgba(0, 0, 0, 0.1) 0 2px 4px;
+        color: #ffffff;
+        cursor: pointer;
+        height: 36px;
+        line-height: 30px;
+        padding: 0 20px;
+        border: 0;
+        transition: box-shadow 0.2s;
+        margin-top: 15px;
+        display: none;
+        font-family: inherit;
+        font-size: 14px;
+        width: auto;
+      }
+
+      #restart:hover {
+        box-shadow: rgba(253, 76, 0, 0.5) 0 3px 8px;
+      }
+
+      @media only screen and (max-width: 768px) {
+        h1 {
+          position: absolute;
+          left: 30px;
+        }
+        .polygon {
+          width: 90vw;
+          height: 90vw;
+          max-width: 450px;
+          max-height: 450px;
+          margin-top: 50px;
+        }
+
+        .score {
+          top: 10px;
+          right: 5vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-area">
+      <div class="score">
+        <h1>Score: <span id="point">0</span></h1>
+      </div>
+      <div class="polygon" id="polygon1">
+        <div class="object" id="object"></div>
+        <div class="object" id="object2"></div>
+      </div>
+    </div>
+    <h2 id="lose" style="display: none"></h2>
+    <button id="restart" style="display: none">დაიწყე თამაში ახლიდან</button>
+    <audio id="pop" controls style="display: none">
+      <source src="mp3/Pop.mp3" type="audio/mp3" />
+      Your browser does not support the audio element.
+    </audio>
+
+    <script>
+      const point = document.getElementById("point");
+      const object = document.getElementById("object");
+      const object2 = document.getElementById("object2");
+      const polygon = document.getElementById("polygon1");
+      const pop = document.getElementById("pop");
+
+      const restart = document.getElementById("restart");
+      const lose = document.getElementById("lose");
+
+      let score = 0;
+
+      function randomPosition(element) {
+        const currentSize = parseInt(getComputedStyle(element).width);
+        const maxLeft = polygon.clientWidth - currentSize;
+        const maxTop = polygon.clientHeight - currentSize;
+
+        const y = Math.random() * maxLeft;
+        const x = Math.random() * maxTop;
+
+        element.style.left = `${y}px`;
+        element.style.top = `${x}px`;
+      }
+
+      function initializeObjects() {
+        randomPosition(object);
+        randomPosition(object2);
+      }
+
+      function hardgame() {
+        let newSize;
+        if (score >= 100) {
+          newSize = "15px";
+        } else if (score >= 50) {
+          newSize = "20px";
+        } else {
+          newSize = "30px";
+        }
+        object.style.width = newSize;
+        object.style.height = newSize;
+        object2.style.width = newSize;
+        object2.style.height = newSize;
+      }
+
+      function handleObjectClick(e) {
+        e.stopPropagation();
+        score++;
+        point.textContent = score;
+        randomPosition(e.target);
+        hardgame();
+        if (pop.readyState >= 2) {
+          pop.currentTime = 0;
+          pop
+            .play()
+            .catch((error) => console.error("Audio playback failed:", error));
+        }
+      }
+
+      object.addEventListener("click", handleObjectClick);
+      object2.addEventListener("click", handleObjectClick);
+
+      polygon.addEventListener("click", () => {
+        lose.textContent = `შენ წააგე. შენი შედეგი ${score}`;
+        lose.style.display = "block";
+        restart.style.display = "block";
+        polygon.style.pointerEvents = "none";
+        object.style.display = "none";
+        object2.style.display = "none";
+      });
+
+      restart.addEventListener("click", () => {
+        polygon.style.pointerEvents = "auto";
+        lose.style.display = "none";
+        restart.style.display = "none";
+        object.style.display = "block";
+        object2.style.display = "block";
+        score = 0;
+        point.textContent = score;
+        hardgame();
+        initializeObjects();
+      });
+
+      hardgame();
+      initializeObjects();
+    </script>
+  </body>
+</html>
