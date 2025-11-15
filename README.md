@@ -8,7 +8,7 @@ Clicking anywhere outside the targets results in an instant **Game Over**.
 
 ## 🎮 Demo
 
-👉 **Live Demo:** *[(add your Netlify/test URL here)](https://redclick.netlify.app)*  
+👉 **Live Demo:** *[(game link)](https://redclick.netlify.app)*  
 
 ---
 
