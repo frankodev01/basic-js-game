@@ -96,21 +96,12 @@ Copy code
 index.html
 in any modern browser.
 
-Option 2 — Run Local Server
-bash
-Copy code
-python -m http.server 8000
-Then open:
-
 arduino
 Copy code
 http://localhost:8000
 🔮 Future Improvements
-⏱️ Timer game modes
 
 🎵 More sounds & animations
-
-🏆 High score saving (LocalStorage)
 
 🎮 Difficulty modes (Easy / Normal / Hard)
 
